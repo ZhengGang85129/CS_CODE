@@ -2,64 +2,67 @@
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
-
 using namespace std;
-
 const int SQUARE = 8;
 int board[SQUARE][SQUARE] ;
-int currentRow , currentColumn;
 const int PossibleMove = 8;
 int horizontal[ PossibleMove ] = {
     2, 1,-1,-2,-2,-1, 1, 2
 }, vertical[ PossibleMove ] = {
     -1,-2,-2,-1, 1, 2, 2, 1
 };
-bool flag = true;
 void Initialization( int[][SQUARE] , const int );
-void display( const int[][SQUARE] , const int );
+void Display( const int[][SQUARE] , const int );
+void Tour( int[][SQUARE] , const int ,const int , const int );
 int main()
 {
-  currentRow = 3 ;
-  currentColumn = 4;
-  Initialization( board , SQUARE);
-  board[ currentRow ][ currentColumn ] = 1;
-  int tempRow, tempCol;
-  int square_left = 63;
-  display(board, SQUARE);
-  while( square_left ){
-    bool flag = false;
+
+  srand(time(0));
+  Initialization( board , SQUARE );
+  Display( board, SQUARE ); 
+  Tour( board , SQUARE ,3 , 4);
+  Display( board, SQUARE ); 
+
+}
+void Tour ( int arr[][SQUARE] , const int size, const int Init_Col, const int Init_Row)
+{
+   static int currentRow , currentCol ; 
+   currentRow = Init_Row ;
+   currentCol = Init_Col ; 
+   arr[ currentRow ][ currentCol ] = -1 ;
+   int square_left = size * size - 1 ;
+   while( square_left )
+   {
+    bool flag  = false;
+    static int tempRow, tempCol ; 
     for( int moveType = 0 ; moveType < PossibleMove ; moveType++){
         tempRow = currentRow;
-        tempCol = currentColumn;
+        tempCol = currentCol;
         currentRow    += vertical[ moveType ];
-        currentColumn += horizontal[ moveType ] ;
-        if(currentColumn >=0 && currentColumn <=7 && currentRow >= 0 && currentRow <=7)
+        currentCol += horizontal[ moveType ] ;
+        if(currentCol >=0 && currentCol <=size - 1 && currentRow >= 0 && currentRow <=size - 1)
         {
-            if( board[ currentRow ][ currentColumn ] != 0){
-                currentRow = tempRow;
-                currentColumn = tempCol;
-            }
-            else{
+            if( arr[ currentRow ][ currentCol ] == 0)
+            {
+                arr[ currentRow ][ currentCol ] = size * size - square_left;
                 flag = true;
-                board[ currentRow ][ currentColumn ]++;
+                square_left -- ;
                 break;
             }
-
         }
-            
+        currentRow = tempRow;
+        currentCol = tempCol;
     }
-    if(flag == true)
-        square_left--;
-    else
+    if(flag == false)
     {
-        cout<<"Row: "<<currentRow<<" Col: "<<currentColumn<<endl;
-        break; 
+        break;
     }
-  }
-  display(board, SQUARE); 
-  cout<<"There are "<<square_left<<" squares left !"<<endl;
+   }
+   cout<<"The last step is at Row : "<<currentRow<<" Column: "<<currentCol<<endl;
+   cout<<"There are "<<square_left<<" squares left !"<<endl;
+
 }
-void display(const int arr[][SQUARE], const int size){
+void Display(const int arr[][SQUARE], const int size){
     cout<<"Screening of the current board: "<<endl;
     cout<<"  ";
     for(int row = 0 ; row < size ; row ++){
@@ -83,5 +86,4 @@ void Initialization(int arr[][SQUARE],const int size)
             arr[ row ][ col ] = 0 ; 
         }
     }
-
  }
