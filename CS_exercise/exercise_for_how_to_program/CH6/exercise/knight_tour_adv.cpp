@@ -39,7 +39,7 @@ int horizontal[ PossibleMove ] = {
     -1,-2,-2,-1, 1, 2, 2, 1
 };
 void Initialization( int[][SQUARE] , const int );
-void Display( const int[][SQUARE] , const int ,const int );
+void Display( const int[][SQUARE] , const int ,const int  , const int , const int );
 void Tour( int[][SQUARE] , int[][SQUARE] , const int ,const int , const int , bool& , int&);
 int main()
 {
@@ -62,17 +62,17 @@ int main()
                 cout<<"Screening of the current board: "<<endl;
                 cout<<"  ";
                 for(int row = 0 ; row < SQUARE ; row ++){
+                    
                     cout<<setw(5)<<row; 
                 }
                 cout<<"\n"<<endl;
-                //Display( board, SQUARE - 1 , SQUARE - 1); 
+                Display( board, 0 , 0 , SQUARE , SQUARE); 
           }
                       
       }
   }
     cout<<"Success "<<success_counter<<" times ."<<endl;
     Initialization( board , SQUARE);
-    Display(board , SQUARE - 1 , SQUARE - 1);
 }
 void Tour ( int arr[][SQUARE] , int acs[][SQUARE] , const int size, const int Init_Col, const int Init_Row , bool &flag1 , int &ctr )
 {
@@ -128,14 +128,21 @@ void Tour ( int arr[][SQUARE] , int acs[][SQUARE] , const int size, const int In
     }
    }
 }
-void Display(const int arr[][SQUARE], const int ROW , const int COL ){
-    if(ROW > 0)
-        Display( arr , ROW - 1, COL );
-    if(COL > 0 )
-        Display( arr , ROW , COL -1 );
-    cout<<arr[ ROW ][ COL ]<<setw(5);
-    if( COL == 7)
-        cout<<"\n"<<endl;
+void Display(const int arr[][SQUARE], const int ROW , const int COL ,const int size_row , const int size_col){
+    if( ROW == size_row - 1 and COL == size_col - 1 )
+        cout<<setw(5)<< arr[ ROW ][ COL ]<<endl;
+    else if ( COL < size_col - 1  )
+    {
+        if(COL == 0 )
+            cout<<ROW<<" ";
+        cout<<setw(5)<<arr[ ROW ][ COL ];
+        Display( arr , ROW , COL + 1 , size_row , size_col );
+    }
+    else if ( COL == size_col - 1 and ROW < size_row - 1 )
+    {
+        cout<<setw(5)<<arr[ ROW ][ COL ]<<"\n"<<endl;
+        Display( arr , ROW + 1 , 0 , size_row , size_col );
+    }
 }
 void Initialization(int arr[][SQUARE],const int size)
  {
