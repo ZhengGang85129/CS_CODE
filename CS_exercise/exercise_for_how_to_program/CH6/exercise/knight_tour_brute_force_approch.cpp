@@ -5,33 +5,6 @@
 using namespace std;
 const int SQUARE = 8;
 int board[SQUARE][SQUARE] ;
-int accessibility[ SQUARE ][ SQUARE ] =
-{
-    {
-        2 , 3 , 4 , 4 , 4 , 4 , 3 , 2 
-    },
-    {
-        3 , 4 , 6 , 6 , 6 , 6 , 4 , 3
-    },
-    {
-        4 , 6 , 8 , 8 , 8 , 8 , 6 , 4
-    },
-    {
-        4 , 6 , 8 , 8 , 8 , 8 , 6 , 4
-    },
-    {
-        4 , 6 , 8 , 8 , 8 , 8 , 6 , 4
-    },
-    {
-        4 , 6 , 8 , 8 , 8 , 8 , 6 , 4
-    },
-    {
-        3 , 4 , 6 , 6 , 6 , 6 , 4 , 3
-    },
-    {
-        2 , 3 , 4 , 4 , 4 , 4 , 3 , 2
-    }
-};
 const int PossibleMove = 8;
 int horizontal[ PossibleMove ] = {
     2, 1,-1,-2,-2,-1, 1, 2
@@ -40,93 +13,38 @@ int horizontal[ PossibleMove ] = {
 };
 void Initialization( int[][SQUARE] , const int );
 void Display( const int[][SQUARE] , const int ,const int  , const int , const int );
-void Tour( int[][SQUARE] , int[][SQUARE] , const int ,const int , const int , bool& , int&);
+void Tour( int[][SQUARE] , const int , bool& , int& , int , int );
+bool random_pick(int [][SQUARE], int & ,  int &, int &);
 int main()
 {
   srand(time(0));
-  int counter = 0;
-  int success_counter = 0;
-  for( int i = 0 ; i < SQUARE ; i++)
-  {
-      for( int j = 0; j < SQUARE ; j++)
-      {
-          bool f = false;
-          int COL = j ;
-          int ROW = i  ;
-          ++counter ;
-          cout<<"=========== Round "<<counter<<" ==========="<<endl;
-          Initialization( board , SQUARE );
-          Tour( board , accessibility,  SQUARE ,COL , ROW , f ,success_counter);
-          if(f == true)
-          {
-                cout<<"Screening of the current board: "<<endl;
-                cout<<"  ";
-                for(int row = 0 ; row < SQUARE ; row ++){
-                    
-                    cout<<setw(5)<<row; 
-                }
-                cout<<"\n"<<endl;
-                Display( board, 0 , 0 , SQUARE , SQUARE); 
-          }
-                      
-      }
-  }
-    cout<<"Success "<<success_counter<<" times ."<<endl;
-    Initialization( board , SQUARE);
+  Initialization( board , SQUARE);
+  int DISTANCE = 1 ;
+  int Column = rand()%8;
+  int Row = rand()%8;
+  bool FLAG = true;
+  Tour(board, SQUARE, FLAG , DISTANCE , Column, Row );
 }
-void Tour ( int arr[][SQUARE] , int acs[][SQUARE] , const int size, const int Init_Col, const int Init_Row , bool &flag1 , int &ctr )
+void Tour ( int arr[][SQUARE] ,  const int size, bool & flag , int &distance  , int col , int row)
 {
-   static int currentRow , currentCol ; 
-   currentRow = Init_Row ;
-   currentCol = Init_Col ; 
-   arr[ currentRow ][ currentCol ] = -1 ;
-   int square_left = size * size - 1 ;
-   while( square_left )
-   {
-    bool flag  = false;
-    static int tempRow, tempCol ;
-    static int bestRow , bestCol ; 
-    int min_acess = 10000;
-    for( int moveType = 0 ; moveType < PossibleMove ; moveType++){
-        tempRow = currentRow;
-        tempCol = currentCol;
-        currentRow    += vertical[ moveType ];
-        currentCol += horizontal[ moveType ] ;
-        if(currentCol >=0 && currentCol <=size - 1 && currentRow >= 0 && currentRow <=size - 1)
-        {
-            if( arr[ currentRow ][ currentCol ] == 0 && acs[ currentRow ][ currentCol ] < min_acess)
-            {
-                min_acess = acs[ currentRow ][ currentCol ];
-                bestRow = currentRow ;
-                bestCol = currentCol ; 
-                flag = true ;
-            }
-        }
-        currentRow = tempRow;
-        currentCol = tempCol;
-    }
-    if(flag == false)
+    if(flag)
     {
-        cout<<"failed"<<endl;
-        break;
+        arr[ row ][ col ] = distance ;
+        flag = random_pick( arr , col , row , distance );
+        Tour( arr , size , flag , distance , col , row );
     }
-
     else
     {
-        currentRow  = bestRow ;
-        currentCol  = bestCol ; 
-        acs[ currentRow ][ currentCol] --;
-        arr[ currentRow ][ currentCol] = size*size - square_left;
-        square_left -- ;
-        if(square_left == 0 ){
-            ctr ++;
-            flag1 = true;
-            cout<<"success"<<endl;
-            break;
+        if(distance == 64 )
+            cout<<"Success!"<<endl;
+        else
+        {
+            cout<<"Fail!"<<endl;
+            cout<<"The knight has only "<<distance<<" moves. "<<endl;
         }
+        Display( arr, 0 , 0 , SQUARE , SQUARE );
 
     }
-   }
 }
 void Display(const int arr[][SQUARE], const int ROW , const int COL ,const int size_row , const int size_col){
     if( ROW == size_row - 1 and COL == size_col - 1 )
@@ -154,3 +72,34 @@ void Initialization(int arr[][SQUARE],const int size)
         }
     }
  }
+
+bool random_pick( int a[][SQUARE] ,int &COL , int &ROW , int &DISTANCE )
+{
+    int current_col = COL ;
+    int current_row = ROW ;
+    int pick_list[ SQUARE ] = {
+        0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 
+    };
+    int cnt = SQUARE ;
+    int TYPE;
+    do
+    {
+        TYPE = rand() % cnt ;
+        current_col += horizontal[ pick_list[ TYPE ] ];
+        current_row += vertical[ pick_list[ TYPE ] ];
+        if(current_col < 8 and current_col >= 0 and current_row < 8 and current_row >= 0  and a[ current_row ][ current_col ] == 0)
+        {
+            DISTANCE ++ ;
+            a[current_row][current_col] = DISTANCE ;
+            COL = current_col;
+            ROW = current_row;
+            return true;
+        }
+        current_row = ROW ;
+        current_col = COL ;
+        int tmp = pick_list[ TYPE ];
+        pick_list[ TYPE ] = pick_list[ cnt - 1  ];
+        cnt-- ;
+    }while(cnt > 0);
+    return false;
+}
