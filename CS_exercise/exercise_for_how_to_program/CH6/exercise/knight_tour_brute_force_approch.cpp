@@ -4,6 +4,7 @@
 #include <iomanip>
 using namespace std;
 const int SQUARE = 8;
+const int TRY = 1000;
 int board[SQUARE][SQUARE] ;
 const int PossibleMove = 8;
 int horizontal[ PossibleMove ] = {
@@ -11,19 +12,39 @@ int horizontal[ PossibleMove ] = {
 }, vertical[ PossibleMove ] = {
     -1,-2,-2,-1, 1, 2, 2, 1
 };
+int Track[ 1000 ] ={0};
 void Initialization( int[][SQUARE] , const int );
 void Display( const int[][SQUARE] , const int ,const int  , const int , const int );
 void Tour( int[][SQUARE] , const int , bool& , int& , int , int );
 bool random_pick(int [][SQUARE], int & ,  int &, int &);
+void print(const int [] , const int );
 int main()
 {
   srand(time(0));
   Initialization( board , SQUARE);
-  int DISTANCE = 1 ;
+  int counter = 0;
+  int DISTANCE ; 
   int Column = rand()%8;
   int Row = rand()%8;
   bool FLAG = true;
-  Tour(board, SQUARE, FLAG , DISTANCE , Column, Row );
+  while( DISTANCE != 64 )
+  {
+      DISTANCE = 1 ;
+      Tour(board, SQUARE, FLAG , DISTANCE , Column, Row );
+      //Track[ counter ] = DISTANCE;
+      counter ++;
+      Initialization( board , SQUARE);
+      Column = rand()%8;
+      Row    = rand()%8;
+      FLAG = true;
+      if(DISTANCE != 64)
+        cout<<setw(5)<<DISTANCE;
+      if((counter+1) % 20 == 0)
+          cout<<"\n";
+  }
+  cout<<"\n";
+  cout<<"This program has tried "<<counter<<" times.\n";
+  //print(Track,counter-1);
 }
 void Tour ( int arr[][SQUARE] ,  const int size, bool & flag , int &distance  , int col , int row)
 {
@@ -36,15 +57,23 @@ void Tour ( int arr[][SQUARE] ,  const int size, bool & flag , int &distance  , 
     else
     {
         if(distance == 64 )
-            cout<<"Success!"<<endl;
+        {
+            cout<<"\n\nSuccess!"<<endl;
+            cout<<"  ";
+            for(int row = 0 ; row < SQUARE ; row ++)
+                cout<<setw(5)<<row;
+            cout<<"\n\n";
+            Display( arr, 0 , 0 , SQUARE , SQUARE );
+            cout<<"\n"<<endl;
+        }
         else
         {
-            cout<<"Fail!"<<endl;
-            cout<<"The knight has only "<<distance<<" moves. "<<endl;
+//            cout<<"Fail!"<<endl;
+//            cout<<"The knight has only "<<distance<<" moves. "<<endl;
         }
-        Display( arr, 0 , 0 , SQUARE , SQUARE );
 
     }
+
 }
 void Display(const int arr[][SQUARE], const int ROW , const int COL ,const int size_row , const int size_col){
     if( ROW == size_row - 1 and COL == size_col - 1 )
@@ -102,4 +131,16 @@ bool random_pick( int a[][SQUARE] ,int &COL , int &ROW , int &DISTANCE )
         cnt-- ;
     }while(cnt > 0);
     return false;
+}
+void print(const  int track[] , const int pos)
+{
+    if(pos == 0 )
+        cout<<setw(5)<<track[pos];
+    else
+    {
+        print( track , pos - 1 );
+        cout<<setw(5)<<track[pos];
+        if( (pos+1) % 10 == 0)
+            cout<<endl;
+    }
 }
